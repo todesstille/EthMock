@@ -91,6 +91,11 @@ describe("AaveV2", () => {
             depositAmount = ethers.parseEther("1");
         });
 
+        it("should have correct treasury address in aToken", async () => {
+            const treasury = await aWETH.RESERVE_TREASURY_ADDRESS();
+            expect(treasury.toLowerCase()).to.equal("0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c".toLowerCase());
+        });        
+
         it("could deposit weth and receive aWeth", async () => {
             await weth.connect(alice).approve(landingPool.target, depositAmount);
             
@@ -102,6 +107,28 @@ describe("AaveV2", () => {
             )
 
             expect(await aWETH.balanceOf(alice.address)).to.equal(depositAmount);
+            expect(await weth.balanceOf(aWETH.target)).to.equal(depositAmount);
+        });
+        it("could withdraw weth", async () => {
+            await weth.connect(alice).approve(landingPool.target, depositAmount);
+            
+            await landingPool.connect(alice).deposit(
+                weth.target,
+                depositAmount,
+                alice.address,
+                0
+            )
+
+            await aWETH.connect(alice).transfer(bob.address, depositAmount);
+
+            await landingPool.connect(bob).withdraw(
+                weth.target,
+                depositAmount,
+                bob.address
+            );
+
+            expect(await weth.balanceOf(bob.address)).to.equal(depositAmount);
+            expect(await aWETH.balanceOf(bob.address)).to.equal(0);
         });
     });
 });
