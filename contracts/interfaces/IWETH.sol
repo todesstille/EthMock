@@ -6,5 +6,7 @@ interface IWETH {
     function decimals() external view returns(uint256);
     function deposit() external payable;
     function transfer(address to, uint value) external returns (bool);
+    function approve(address to, uint value) external returns (bool);
     function withdraw(uint) external;
+    function balanceOf(address) external view returns (uint256);
 }
