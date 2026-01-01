@@ -1,6 +1,8 @@
 const hre = require("hardhat");
 
 const deployAaveV2 = async (admin) => {
+
+    // Address provider
     await hre.ethers.provider.send("hardhat_setCode", [
         aaveV2AddressProviderAddress,
         aaveV2AddressProviderBytecode,
@@ -18,6 +20,9 @@ const deployAaveV2 = async (admin) => {
         "0x416176652067656e65736973206d61726b657400000000000000000000000026"
     ])
 
+    let addressProvider = await hre.ethers.getContractAt("ILendingPoolAddressesProvider", "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5");
+
+    // WETH
     await hre.ethers.provider.send("hardhat_setCode", [
         WETHAddress,
         WETHBytecode,
@@ -41,6 +46,7 @@ const deployAaveV2 = async (admin) => {
         "0x0000000000000000000000000000000000000000000000000000000000000012"
     ])
 
+    // Price oracle
     await hre.ethers.provider.send("hardhat_setCode", [
         aaveV2PriceOracleAddress,
         aaveV2PriceOracleBytecode,
@@ -52,6 +58,7 @@ const deployAaveV2 = async (admin) => {
         "0x000000000000000000000000" + admin.address.slice(2)
     ])
 
+    await addressProvider.setPriceOracle(aaveV2PriceOracleAddress);
 }
 
 module.exports = {
